@@ -8,6 +8,8 @@ import helmet from "helmet"; // request safety
 import morgan from "morgan"; // logging
 import path from "path"; // to set paths
 import { fileURLToPath } from "url"; // to set paths
+import authRoutes from "./routes/auth";
+import { register } from "./controllers/auth.js"; // controller endpoints
 
 /* CONFIGURATIONS - Middleware and package configs */
 const __filename = fileURLToPath(import.meta.url); // to grab file URL
@@ -21,24 +23,33 @@ app.use(morgan("common"));
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
-app.use("/assets", express.static(path.join(__dirname, 'public/assets'))); // directory of assets - images stored locally
+app.use("/assets", express.static(path.join(__dirname, "public/assets"))); // directory of assets - images stored locally
 
 /* FILE STORAGE - To save files using multer */
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, "public/assets");
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    }
+  destination: function (req, file, cb) {
+    cb(null, "public/assets");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
+  },
 });
 const upload = multer({ storage }); // variable when uploading files
 
+/* ROUTES WITH FILES */
+app.post("/auth/register", upload.single("picture"), register); // use a middleware to upload picture locally
+
+/* ROUTES - setup routes and keep files organised*/
+app.use("/auth", authRoutes);
+
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001; // backup port
-mongoose.connect(process.env.MONGO_URL, {
+mongoose
+  .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-}).then(() => {
+  })
+  .then(() => {
     app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
-}).catch((error) => console.log(`${error} did not connect`));
+  })
+  .catch((error) => console.log(`${error} did not connect`));
