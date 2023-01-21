@@ -10,6 +10,7 @@ import path from "path"; // to set paths
 import { fileURLToPath } from "url"; // to set paths
 import authRoutes from "./routes/auth";
 import { register } from "./controllers/auth.js"; // controller endpoints
+import { verifyToken } from "./middleware/auth";
 
 /* CONFIGURATIONS - Middleware and package configs */
 const __filename = fileURLToPath(import.meta.url); // to grab file URL
@@ -37,7 +38,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage }); // variable when uploading files
 
 /* ROUTES WITH FILES */
-app.post("/auth/register", upload.single("picture"), register); // use a middleware to upload picture locally
+app.post("/auth/register", upload.single("picture"), verifyToken, register); // use a middleware to upload picture locally
 
 /* ROUTES - setup routes and keep files organised*/
 app.use("/auth", authRoutes);
