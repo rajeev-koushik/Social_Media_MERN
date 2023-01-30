@@ -9,6 +9,7 @@ import morgan from "morgan"; // logging
 import path from "path"; // to set paths
 import { fileURLToPath } from "url"; // to set paths
 import authRoutes from "./routes/auth";
+import userRoutes from "./routes/users";
 import { register } from "./controllers/auth.js"; // controller endpoints
 import { verifyToken } from "./middleware/auth";
 
@@ -42,6 +43,7 @@ app.post("/auth/register", upload.single("picture"), verifyToken, register); // 
 
 /* ROUTES - setup routes and keep files organised*/
 app.use("/auth", authRoutes);
+app.use("/users", userRoutes);
 
 /* MONGOOSE SETUP */
 const PORT = process.env.PORT || 6001; // backup port
